@@ -6,6 +6,7 @@
 // <http://www.omnigroup.com/developer/sourcecode/sourcelicense/>.
 
 #import <OmniUI/OUIUndoIndicator.h>
+#import <QuartzCore/QuartzCore.h>
 
 RCS_ID("$Id$");
 

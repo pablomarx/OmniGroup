@@ -9,6 +9,8 @@
 
 #import "OUIColorSwatch.h"
 
+#import <OmniFoundation/NSArray-OFExtensions.h>
+#import <OmniFoundation/NSString-OFSimpleMatching.h>
 #import <OmniQuartz/OQColor.h>
 
 RCS_ID("$Id$");

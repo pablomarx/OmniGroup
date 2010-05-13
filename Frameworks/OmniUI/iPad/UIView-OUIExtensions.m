@@ -8,6 +8,8 @@
 #import <OmniUI/UIView-OUIExtensions.h>
 #import <OmniUI/OUILoadedImage.h>
 #import <OmniQuartz/OQDrawing.h>
+
+#import <QuartzCore/QuartzCore.h>
 #import <UIKit/UIView.h>
 
 RCS_ID("$Id$");

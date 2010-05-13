@@ -11,6 +11,7 @@
 #import <OmniUI/OUIDrawing.h>
 #import <OmniQuartz/OQColor.h>
 #import <OmniQuartz/OQDrawing.h>
+#import <QuartzCore/QuartzCore.h>
 
 RCS_ID("$Id$");
 

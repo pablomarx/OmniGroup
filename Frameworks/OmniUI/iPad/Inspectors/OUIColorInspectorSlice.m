@@ -15,6 +15,7 @@
 #import <OmniUI/OUIColorValue.h>
 #import <OmniUI/OUIInspectorSelectionValue.h>
 
+#import <OmniFoundation/NSString-OFSimpleMatching.h>
 #import <OmniFoundation/OFPreference.h>
 #import <OmniQuartz/OQColor.h>
 

@@ -7,6 +7,7 @@
 
 #import <OmniUI/OUIPaletteTheme.h>
 
+#import <OmniBase/NSError-OBExtensions.h>
 #import <OmniQuartz/OQColor.h>
 
 RCS_ID("$Id$");
