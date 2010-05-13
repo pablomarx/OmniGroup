@@ -1,0 +1,14 @@
+//
+// Prefix header for all source files of the 'OmniTextEditor' target in the 'OmniTextEditor' project
+//
+
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+    #import <UIKit/UIKit.h>
+    #import <OmniBase/rcsid.h>
+    #import <OmniBase/assertions.h>
+    #import <OmniBase/OBUtilities.h>
+    #import <OmniBase/macros.h>
+    #import <OmniFoundation/OFNull.h>
+    #import <OmniFoundation/OFUtilities.h>
+#endif
