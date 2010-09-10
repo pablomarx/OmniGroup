@@ -65,7 +65,7 @@ BOOL OUIShouldLogPerformanceMetrics;
     [self presentError:error file:NULL line:0];
 }
 
-+ (void)presentError:(NSError *)error file:(const char *)file line:(int)line;
++ (void)_presentError:(NSError *)error file:(const char *)file line:(int)line cancelButtonTitle:(NSString *)cancelButtonTitle;
 {
     if (error == nil || [error causedByUserCancelling])
         return;
@@ -74,10 +74,19 @@ BOOL OUIShouldLogPerformanceMetrics;
         NSLog(@"Error source file:%s line:%d", file, line);
     NSLog(@"%@", [error toPropertyList]);
     
-    UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:[error localizedDescription] message:[error localizedRecoverySuggestion] delegate:self cancelButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", @"OmniUI", OMNI_BUNDLE, @"button title") otherButtonTitles:nil] autorelease];
+    UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:[error localizedDescription] message:[error localizedRecoverySuggestion] delegate:self cancelButtonTitle:cancelButtonTitle otherButtonTitles:nil] autorelease];
     [alert show];
 }
 
++ (void)presentError:(NSError *)error file:(const char *)file line:(int)line;
+{
+    [self _presentError:error file:file line:line cancelButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", @"OmniUI", OMNI_BUNDLE, @"button title")];
+}
+
++ (void)presentAlert:(NSError *)error file:(const char *)file line:(int)line;
+{
+    [self _presentError:error file:file line:line cancelButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", @"OmniUI", OMNI_BUNDLE, @"button title")];
+}
 
 - (void)dealloc;
 {
