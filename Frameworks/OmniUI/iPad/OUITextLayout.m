@@ -39,7 +39,7 @@ static LineMeasurements _lineMeasurements(CTFrameRef frame, CFArrayRef lines, NS
 
 CTFontRef OUIGlobalDefaultFont(void)
 {
-    CTFontRef globalFont = NULL;
+    static CTFontRef globalFont = NULL;
     if (!globalFont)
         globalFont = CTFontCreateWithName(CFSTR("Helvetica"), 12, NULL);
     return globalFont;
