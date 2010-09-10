@@ -375,6 +375,13 @@ static OUIOverlayView *_overlayView = nil;
     
     CGPoint touch1 = [gestureRecognizer locationOfTouch:0 inView:stableView];
     CGPoint touch2 = [gestureRecognizer locationOfTouch:1 inView:stableView];
+    CGPoint center = CGPointMake((touch1.x + touch2.x)/2, (touch1.y + touch2.y)/2);
+    
+    // If the touches are roughly vertical, use the median point rather than guessing which side the hand is on.
+    if (fabs(touch1.x - touch2.x) < 20) {
+        return center;
+    }
+    
     CGPoint touchVector = CGPointMake(touch2.x - touch1.x, touch2.y - touch1.y);
     
     // Make sure the vector is pointing up
@@ -396,7 +403,6 @@ static OUIOverlayView *_overlayView = nil;
     }
     
     // Calculate actual point
-    CGPoint center = CGPointMake((touch1.x + touch2.x)/2, (touch1.y + touch2.y)/2);
     center.x += vPerp.x;
     center.y += vPerp.y;
     
