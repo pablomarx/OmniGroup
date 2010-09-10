@@ -14,6 +14,7 @@
 #import "OUITextCursorOverlay.h"
 #import "OUILoupeOverlay.h"
 #import "OUEFTextSpan.h"
+#import "OUIDirectTapGestureRecognizer.h"
 
 #import "OUIColorInspectorSlice.h"
 #import "OUIFontInspectorSlice.h"
@@ -619,6 +620,13 @@ static void getTypographicPosition(CFArrayRef lines, NSUInteger posIndex, int af
 
 - (void)dealloc;
 {
+    for(int i = 0; i < EF_NUM_ACTION_RECOGNIZERS; i++) {
+        [actionRecognizers[i] release];
+    }
+
+    [focusRecognizer release];
+    [_rangeSelectionColor release];
+    
     if (defaultParagraphStyle)
         CFRelease(defaultParagraphStyle);
     if (defaultFont)
@@ -1194,7 +1202,7 @@ static void notifyAfterMutate(OUIEditableFrame *self, SEL _cmd)
     BOOL didBecomeFirstResponder = [super becomeFirstResponder];
     
     if (didBecomeFirstResponder && !actionRecognizers[0]) {
-        UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_activeTap:)];
+        UITapGestureRecognizer *singleTap = [[OUIDirectTapGestureRecognizer alloc] initWithTarget:self action:@selector(_activeTap:)];
         actionRecognizers[0] = singleTap;
         [self addGestureRecognizer:singleTap];
         // singleTap.maximumSingleTapDuration = 1.5;
