@@ -56,7 +56,7 @@ RCS_ID("$Id$");
 
         CGPoint centerPoint = touchPoint;
         if (subjectView)
-            centerPoint = [subjectView convertPoint:centerPoint toView:[self superview]];
+            centerPoint = [(OUIScalingView *)subjectView convertPoint:centerPoint toView:[self superview]];
         
         self.center = centerPoint;
     } else {
@@ -66,7 +66,7 @@ RCS_ID("$Id$");
         newFrame.size = loupeFramePosition.size;
         
         if (subjectView)
-            newFrame = [subjectView convertRect:newFrame toView:[self superview]];
+            newFrame = [(OUIScalingView *)subjectView convertRect:newFrame toView:[self superview]];
         
         self.frame = newFrame;
     }        
@@ -147,14 +147,17 @@ RCS_ID("$Id$");
             case OUILoupeOverlayRectangle:
             {
                 UIImage *plainImage = [UIImage imageNamed:@"OUIRectangularOverlayFrame.png"];
-                loupeFrameImage = [[plainImage stretchableImageWithLeftCapWidth:60 topCapHeight:0] retain];
+                loupeFrameImage = [[plainImage stretchableImageWithLeftCapWidth:0 topCapHeight:22] retain];
                 CGSize loupeImageSize;
                 loupeImageSize = [plainImage size];
-                CGRect contour = (CGRect){ {14, 58}, { 128, 114 } };
-                loupeImageSize.width += 64;
-                contour.size.width += 64;
+                CGRect contour = (CGRect){ {5.0f, 2.0f}, { 197.0f, 36.0f } }; // This should form a rounded rect within the image
+#if 0
+                // We can make the loupe taller by stretching it here
+                loupeImageSize.height += 78.0f;
+                contour.size.height += 78.0f;
+#endif
                 CGMutablePathRef ring = CGPathCreateMutable();
-                OQAddRoundedRect(ring, contour, 17);
+                OQAddRoundedRect(ring, contour, 6.0f);
                 loupeClipPath = CGPathCreateCopy(ring);
                 CFRelease(ring);
                 loupeTouchPoint.x = CGRectGetMidX(contour);
@@ -189,7 +192,7 @@ RCS_ID("$Id$");
 {
     CGRect bounds = self.bounds;
     CGContextRef ctx = UIGraphicsGetCurrentContext();
-    OUIScalingView *subject = (subjectView) ? (subjectView) : (OUIScalingView *)(self.superview);
+    OUIScalingView <OUILoupeOverlaySubject> *subject = (subjectView) ? (subjectView) : (OUIScalingView <OUILoupeOverlaySubject> *)(self.superview);
 
     /* First draw the contents of the subject view */
     CGContextSaveGState(ctx);
@@ -200,24 +203,6 @@ RCS_ID("$Id$");
             CGContextAddPath(ctx, loupeClipPath);
             CGContextClip(ctx);
         }
-        
-        //if (!subject.opaque) {
-            /* Fill with the owner's background before translating. We want it to seem like its background goes on forever, not have a clear bit if we are near the edge. */
-            
-            UIColor *backgroundColor;
-            backgroundColor = subject.backgroundColor;
-            if (!backgroundColor)
-                backgroundColor = [UIColor whiteColor];
-            
-            [backgroundColor setFill];
-            if (loupeClipPath) {
-                CGContextBeginPath(ctx);
-                CGContextAddPath(ctx, loupeClipPath);
-                CGContextFillPath(ctx);
-            } else {
-                CGContextFillRect(ctx, bounds);
-            }
-        //}
         
         /* We want the touchPoint in the subject view to end up at our loupeTouchPoint point (typically the center of our loupe clip path). */
         
@@ -234,6 +219,9 @@ RCS_ID("$Id$");
         loupeTransform = CGAffineTransformConcat(subjectTransform, loupeTransform);
         CGContextConcatCTM(ctx, loupeTransform);
 
+        /* We can't actually make a patterned background work perfectly because of the scaling, but adjusting the pattern phase here will at least keep the background from appearing to skid around when the loupe is moved. */
+        CGContextSetPatternPhase(ctx, (CGSize){ loupeTransform.tx, loupeTransform.ty });
+        
         /* Compute the rectangle to pass on to the subject view */
         CGRect drawRect;
         if (loupeClipPath) {
@@ -249,6 +237,24 @@ RCS_ID("$Id$");
         if (!CGRectIsEmpty(drawRect)) {
             // Convert the rect to the coordinate system seen by -drawScaledContent:
             drawRect = CGRectApplyAffineTransform(drawRect, CGAffineTransformInvert(loupeTransform));
+            
+            if (!subject.opaque) {
+                if ([subject respondsToSelector:@selector(drawLoupeOverlayBackgroundInRect:)])
+                    [subject drawLoupeOverlayBackgroundInRect:drawRect];
+                else {
+                    UIColor *backgroundColor = nil;
+                    
+                    if ([subject respondsToSelector:@selector(loupeOverlayBackgroundColor)])
+                        backgroundColor = [subject loupeOverlayBackgroundColor];
+
+                    if (!backgroundColor)
+                        backgroundColor = [UIColor whiteColor];
+                    
+                    [backgroundColor setFill];
+                    CGContextFillRect(ctx, drawRect);
+                }
+            }
+            
             [subject drawScaledContent:drawRect];
         }
     }

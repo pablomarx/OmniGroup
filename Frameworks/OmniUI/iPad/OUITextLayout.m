@@ -6,8 +6,11 @@
 // <http://www.omnigroup.com/developer/sourcecode/sourcelicense/>.
 
 #import <OmniUI/OUITextLayout.h>
-#import <Foundation/NSAttributedString.h>
-#import <CoreText/CTStringAttributes.h>
+
+#import <OmniFoundation/NSAttributedString-OFExtensions.h>
+#import <OmniFoundation/NSMutableAttributedString-OFExtensions.h>
+#import <OmniAppKit/OATextAttributes.h>
+#import <OmniQuartz/OQDrawing.h>
 
 #include <string.h>
 
@@ -15,27 +18,18 @@
 
 RCS_ID("$Id$");
 
-#if 0
-typedef struct {
-    CGPoint origin;
-    double width;
-    CGFloat ascent, descent, leading;
-} LineMeasurements;
-
-static LineMeasurements _lineMeasurements(CTFrameRef frame, CFArrayRef lines, NSUInteger lineIndex)
-{
-    LineMeasurements m;
-    memset(&m, 0, sizeof(m));
-    
-    CTLineRef line = CFArrayGetValueAtIndex(lines, lineIndex);
-    m.width = CTLineGetTypographicBounds(line, &m.ascent, &m.descent, &m.leading);
-    CTFrameGetLineOrigins(frame, CFRangeMake(lineIndex, 1), &m.origin);
-    
-    return m;
-}
-#endif
-
 @implementation OUITextLayout
+
++ (NSDictionary *)defaultLinkTextAttributes;
+{
+    static NSDictionary *attributes = nil;
+    
+    if (!attributes)
+        attributes = [[NSDictionary alloc] initWithObjectsAndKeys:(id)[[UIColor blueColor] CGColor], OAForegroundColorAttributeName,
+                      [NSNumber numberWithUnsignedInt:kCTUnderlineStyleSingle], OAUnderlineStyleAttributeName, nil];
+    
+    return attributes;
+}
 
 CTFontRef OUIGlobalDefaultFont(void)
 {
@@ -45,68 +39,17 @@ CTFontRef OUIGlobalDefaultFont(void)
     return globalFont;
 }
 
-#if 0
-// CTFramesetterSuggestFrameSizeWithConstraints seems to be useless. It doesn't return a size that will avoid wrapping in the real frame setter. Also, it doesn't include the descender of the bottom line.
-CGSize OUITextLayoutMeasureSize(CTFrameRef frame)
+- initWithAttributedString:(NSAttributedString *)attributedString_ constraints:(CGSize)constraints;
 {
-    // Now, calculate the union of the line rects. Assuming top->bottom layout here.
-    CFArrayRef lines = CTFrameGetLines(frame);
-    CFIndex lineCount = CFArrayGetCount(lines);
+    _attributedString = [attributedString_ copy];
+    CFAttributedStringRef attributedString = (CFAttributedStringRef)_attributedString;
     
-    CGSize usedSize = CGSizeZero;
-    if (lineCount > 0) {
-        LineMeasurements firstMeasure, lastMeasure;
-        memset(&firstMeasure, 0, sizeof(firstMeasure));
-        memset(&lastMeasure, 0, sizeof(lastMeasure));
-        
-        CGFloat minX = CGFLOAT_MAX;
-        double maxWidth = 0;
-        
-        for (CFIndex lineIndex = 0; lineIndex < lineCount; lineIndex++) {
-            LineMeasurements m = _lineMeasurements(frame, lines, lineIndex);
-            
-            //            CFRange range = CTLineGetStringRange(CFArrayGetValueAtIndex(lines, lineIndex));
-            //            NSLog(@"line %d (range %@):", lineIndex, NSStringFromRange(*(NSRange *)&range));
-            //            NSLog(@"  origin: %@", NSStringFromPoint(m.origin));
-            //            NSLog(@"  width: %f", m.width);
-            //            NSLog(@"  ascent: %f", m.ascent);
-            //            NSLog(@"  descent: %f", m.descent);
-            //            NSLog(@"  leading: %f", m.leading);
-            
-            if (lineIndex == 0)
-                firstMeasure = m;
-            else if (lineIndex == lineCount - 1)
-                lastMeasure = m;
-            
-            minX = MIN(minX, m.origin.x);
-            maxWidth = MAX(maxWidth, m.width);
-        }
-        
-        // CoreText draws at the max end of the space we gave it, going toward the min end.
-        //        NSLog(@"minX:%f maxWidth:%f", minX, maxWidth);
-        
-        CGFloat height;
-        if (lineCount == 1) {
-            height = firstMeasure.ascent + firstMeasure.descent;
-        } else {
-            height = firstMeasure.ascent + (firstMeasure.origin.y - lastMeasure.origin.y) + lastMeasure.descent;
-        }
-        
-        usedSize = CGSizeMake(maxWidth, height);
-    }
-
-    //NSLog(@"measured size = %@", NSStringFromSize(usedSize));
-    return usedSize;
-}
-#endif
-
-- initWithAttributedString:(CFAttributedStringRef)attributedString constraints:(CGSize)constraints;
-{
     OBPRECONDITION(attributedString);
     if (!attributedString) {
         _usedSize = CGRectZero;
         return nil;
     }
+    
     
     CFIndex baseStringLength = CFAttributedStringGetLength(attributedString);
     CFMutableAttributedStringRef paddedString = CFAttributedStringCreateMutableCopy(kCFAllocatorDefault, 1+baseStringLength, attributedString);
@@ -150,11 +93,14 @@ CGSize OUITextLayoutMeasureSize(CTFrameRef frame)
 
 - (void)dealloc;
 {
+    [_attributedString release];
     if (_frame)
         CFRelease(_frame);
 
     [super dealloc];
 }
+
+@synthesize attributedString = _attributedString;
 
 - (CGSize)usedSize
 {
@@ -163,10 +109,26 @@ CGSize OUITextLayoutMeasureSize(CTFrameRef frame)
 
 - (void)drawInContext:(CGContextRef)ctx;
 {
-    CGContextTranslateCTM(ctx, - _usedSize.origin.x, - _usedSize.origin.y);
-    CGContextSetTextPosition(ctx, 0, 0);
-    CGContextSetTextMatrix(ctx, CGAffineTransformIdentity);
-    CTFrameDraw(_frame, ctx);
+    CGRect bounds;
+    bounds.origin = CGPointZero;
+    bounds.size = _usedSize.size;
+    
+    CGPoint layoutOrigin = OUITextLayoutOrigin(_usedSize, UIEdgeInsetsZero, bounds, 1.0f);
+    
+    OUITextLayoutDrawFrame(ctx, _frame, bounds, layoutOrigin);
+}
+
+- (void)drawFlippedInContext:(CGContextRef)ctx bounds:(CGRect)bounds;
+{
+    CGContextSaveGState(ctx);
+    {
+        OQFlipVerticallyInRect(ctx, bounds);
+        
+        CGContextTranslateCTM(ctx, 0, CGRectGetHeight(bounds) - _usedSize.size.height);
+        
+        [self drawInContext:ctx];
+    }
+    CGContextRestoreGState(ctx);
 }
 
 #if 0
@@ -201,6 +163,7 @@ static void _logLines(CGContextRef ctx, CTFrameRef frame)
 }
 #endif
 
+// CTFramesetterSuggestFrameSizeWithConstraints seems to be useless. It doesn't return a size that will avoid wrapping in the real frame setter. Also, it doesn't include the descender of the bottom line.
 CGRect OUITextLayoutMeasureFrame(CTFrameRef frame, BOOL includeTrailingWhitespace)
 {
     CFArrayRef lines = CTFrameGetLines(frame);
@@ -250,102 +213,39 @@ CGRect OUITextLayoutMeasureFrame(CTFrameRef frame, BOOL includeTrailingWhitespac
     }
 }
 
-#if 0
-/* This returns the location, in rendering space, of the origin of the layout space */
-CGPoint OUITextLayoutFrameOrigin(CTFrameRef frame)
+CGPoint OUITextLayoutOrigin(CGRect typographicFrame, UIEdgeInsets textInset, // in text coordinates
+                            CGRect bounds, // view rect we want to draw in
+                            CGFloat scale) // scale factor from text to view
 {
-    CFArrayRef lines = CTFrameGetLines(frame);
-    CFIndex lineCount = CFArrayGetCount(lines);
-
-    // CoreText draws way off at the max Y range of the allowed size we gave it.  Need to shift back.
-    if (lineCount > 0) {
-        CGPoint lineOrigins[lineCount];
-        CTFrameGetLineOrigins(frame, CFRangeMake(0, lineCount), lineOrigins);
-        
-        CGFloat lastLineYValue = 0;
-        CGFloat minXValue = 0;
-        for (CFIndex index = 0; index < lineCount; index++) {
-            CGPoint lineOrigin = lineOrigins[index];
-            if (index == 0 || lineOrigin.x < minXValue)
-                minXValue = lineOrigin.x;
-            
-            if (index == (lineCount-1))
-                lastLineYValue = lineOrigin.y;
-        }
-        //NSLog(@"last line origin = %@", NSStringFromPoint(lastLineOrigin));
-        
-        CTLineRef line = CFArrayGetValueAtIndex(lines, lineCount - 1);
-        CGFloat ascent, descent, leading;
-        /*double width =*/ CTLineGetTypographicBounds(line, &ascent, &descent, &leading);
-        
-        return (CGPoint){ -minXValue, -lastLineYValue + descent };
-    } else {
-        return (CGPoint){ 0, 0 };
-    }
+    // We don't offset the layoutOrigin for a non-zero bounds origin.
+    OBASSERT(CGPointEqualToPoint(bounds.origin, CGPointZero));
+    
+    CGPoint layoutOrigin;
+    
+    // And compute the layout origin, pinning the text to the *top* of the view
+    layoutOrigin.x = - typographicFrame.origin.x;
+    layoutOrigin.y = CGRectGetMaxY(bounds) / scale - CGRectGetMaxY(typographicFrame);
+    layoutOrigin.x += textInset.left;
+    layoutOrigin.y -= textInset.top;
+    
+    // Lessens jumpiness when transitioning between a OUITextLayout for display and OUIEditableFrame for editing. But, it seems weird to be rounding in text space instead of view space. Maybe works out since we end up having to draw at pixel-side for UIKit backing store anyway. Still some room for improvement here.
+//    layoutOrigin.x = floor(layoutOrigin.x);
+//    layoutOrigin.y = floor(layoutOrigin.y);
+    
+    return layoutOrigin;
 }
 
-void OUITextLayoutDrawFrame(CGContextRef ctx, CTFrameRef frame)
+void OUITextLayoutDrawFrame(CGContextRef ctx, CTFrameRef frame, CGRect bounds, CGPoint layoutOrigin)
 {
-    //_logLines(ctx, frame);
-    
-
-    // Drawing text advances the text position and that is NOT saved/restored with the gstate. Reset it each time we draw text to the origin of the coordinate system we just set up.
     CGContextSetTextPosition(ctx, 0, 0);
-    
-    CFArrayRef lines = CTFrameGetLines(frame);
-    CFIndex lineCount = CFArrayGetCount(lines);
-    
-#if 0
-    CGFloat minY = CGFLOAT_MAX, maxY = 0;
-    CGPoint *origins = malloc(sizeof(*origins) * lineCount);
-    CTFrameGetLineOrigins(frame, CFRangeMake(0, lineCount), origins);
-    
-    for (CFIndex lineIndex = 0; lineIndex < lineCount; lineIndex++) {
-        CTLineRef line = CFArrayGetValueAtIndex(lines, lineIndex);
-        CGRect imageBounds = CTLineGetImageBounds(line, ctx);
-        
-        CGFloat ascent, descent, leading;
-        double width = CTLineGetTypographicBounds(line, &ascent, &descent, &leading);
-        
-        NSLog(@"line:%d image bounds:%@ origin:%@", lineIndex, NSStringFromRect(imageBounds), NSStringFromPoint(origins[lineIndex]));
-        NSLog(@"  width:%f ascent:%f descent:%f leading:%f", width, ascent, descent, leading);
-        
-        minY = MIN(minY, CGRectGetMinY(imageBounds));
-        maxY = MAX(maxY, CGRectGetMaxY(imageBounds));
-    }
-    
-    NSLog(@" delta Y for all lines %f", maxY - minY);
-    
-    free(origins);
-#endif
-    
-    // CoreText draws way off at the max Y range of the allowed size we gave it.  Need to shift back.
-    if (lineCount > 0) {
-        CGPoint lineOrigins[lineCount];
-        CTFrameGetLineOrigins(frame, CFRangeMake(0, lineCount), lineOrigins);
-        
-        CGFloat lastLineYValue = 0;
-        CGFloat minXValue = 0;        
-        for (CFIndex index = 0; index < lineCount; index++) {
-            CGPoint lineOrigin = lineOrigins[index];
-            if (index == 0 || lineOrigin.x < minXValue)
-                minXValue = lineOrigin.x;
-                
-            if (index == (lineCount-1))
-                lastLineYValue = lineOrigin.y;
-        }
-        
-        CTLineRef line = CFArrayGetValueAtIndex(lines, lineCount - 1);
-        CGFloat ascent, descent, leading;
-        /*double width =*/ CTLineGetTypographicBounds(line, &ascent, &descent, &leading);
-        
-        CGContextTranslateCTM(ctx, -minXValue, -lastLineYValue + descent);
-    }
-    
     CGContextSetTextMatrix(ctx, CGAffineTransformIdentity);
+    
+    CGContextTranslateCTM(ctx, layoutOrigin.x, layoutOrigin.y);
+        
     CTFrameDraw(frame, ctx);
+
+    CGContextTranslateCTM(ctx, -layoutOrigin.x, -layoutOrigin.y);
 }
-#endif
 
 /* Fix up paragraph styles. We want any paragraph to have only one paragraph style associated with it. */
 void OUITextLayoutFixupParagraphStyles(NSMutableAttributedString *content)
@@ -396,6 +296,39 @@ void OUITextLayoutFixupParagraphStyles(NSMutableAttributedString *content)
             cursor = styleRange.location + styleRange.length;
         }
     }
+}
+
+static NSAttributedString *_applyTransformedAttributes(NSMutableAttributedString *source, NSDictionary *attributes, NSRange matchRange, NSRange effectiveAttributeRange, BOOL *isEditing, void *context)
+{
+    NSDictionary *linkAttributes = context;
+    
+    if ([attributes objectForKey:OALinkAttributeName]) {
+        if (!*isEditing) {
+            [source beginEditing];
+            *isEditing = YES;
+        }
+        [source addAttributes:linkAttributes range:effectiveAttributeRange];
+    }
+    
+    // We made only attribute changes (if any at all).
+    return nil;
+}
+
+// Later, we may have a callout for a delegate to extent the transformation.
+// Returns nil if no transformation is done, instead of returning [soure copy].
+NSAttributedString *OUICreateTransformedAttributedString(NSAttributedString *source, NSDictionary *linkAttributes)
+{
+    if ([linkAttributes count] == 0 || ![source hasAttribute:OALinkAttributeName])
+        return nil; // No transform needed!
+    
+    NSMutableAttributedString *transformed = [source mutableCopy];
+    
+    [transformed mutateRanges:_applyTransformedAttributes matchingString:nil context:linkAttributes];
+    
+    NSAttributedString *immutableResult = [transformed copy];
+    [transformed release];
+
+    return immutableResult;
 }
 
 @end

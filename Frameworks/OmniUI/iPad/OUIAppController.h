@@ -56,7 +56,6 @@
 // UIApplicationDelegate methods that we implement
 - (void)applicationWillTerminate:(UIApplication *)application;
 
-
 // Subclass responsibility
 @property(readonly) UIViewController *topViewController;
 

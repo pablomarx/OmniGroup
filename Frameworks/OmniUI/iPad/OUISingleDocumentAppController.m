@@ -30,7 +30,6 @@ static NSString * const SelectAction = @"select";
 - (void)_mainThread_finishedLoadingDocument:(id)result;
 - (void)_openDocument:(OUIDocumentProxy *)proxy animated:(BOOL)animated;
 - (void)_closeDocument:(id)sender;
-- (void)_undo:(id)sender;
 - (void)_setupGesturesOnTitleTextField;
 - (void)_proxyFinishedLoadingPreview:(NSNotification *)note;
 @end
@@ -69,7 +68,11 @@ static NSString * const SelectAction = @"select";
     
     [_closeDocumentBarButtonItem release];
     [_infoBarButtonItem release];
+    
+    OBASSERT(_undoBarButtonItem.undoManager == nil);
+    _undoBarButtonItem.undoBarButtonItemTarget = nil;
     [_undoBarButtonItem release];
+    
     [_documentTitleTextField release];
     [_documentTitleToolbarItem release];
     
@@ -102,8 +105,10 @@ static NSString * const SelectAction = @"select";
 
 - (UIBarButtonItem *)undoBarButtonItem;
 {
-    if (!_undoBarButtonItem)
-        _undoBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemUndo target:self action:@selector(_undo:)];
+    if (!_undoBarButtonItem) {
+        _undoBarButtonItem = [[OUIUndoBarButtonItem alloc] init];
+        _undoBarButtonItem.undoBarButtonItemTarget = self;
+    }
     return _undoBarButtonItem;
 }
 
@@ -227,9 +232,19 @@ static NSString * const SelectAction = @"select";
         OUIDocumentPicker *documentPicker = self.documentPicker;
         if (oldProxy) {
             NSString *documentType = [self documentTypeForURL:oldProxy.url];
-            OUIDocumentProxy *newProxy = [documentPicker renameProxy:oldProxy toName:newName type:documentType];
+            NSURL *newProxyURL = [documentPicker renameProxy:oldProxy toName:newName type:documentType];
+            OUIDocumentProxy *newProxy = [documentPicker proxyWithURL:newProxyURL];
             OBASSERT(newProxy);
-            [_document setProxy:newProxy];
+            
+            // <bug://bugs/61021> Code below checks for "/" in the name, but there could still be other renaming problems that we don't know about.
+            if (newProxy == oldProxy) {
+                NSString *msg = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"Unable to rename document to \"%@\".", @"OmniUI", OMNI_BUNDLE, @"error when renaming a document"), newName];                
+                NSError *err = [[NSError alloc] initWithDomain:NSURLErrorDomain code:0 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:msg, NSLocalizedDescriptionKey, msg, NSLocalizedFailureReasonErrorKey, nil]];
+                OUI_PRESENT_ERROR(err);
+                [err release];
+            } else {
+                [_document setProxy:newProxy];
+            }
         } else {
             // new document does not have a proxy yet
             NSError *error = nil;
@@ -240,11 +255,9 @@ static NSString * const SelectAction = @"select";
                 NSLog(@"Error renaming unsaved document to %@: %@", [safeURL path], [error toPropertyList]);
             }
             [documentPicker rescanDocuments];
-            
-            NSString *safeName = [[[safeURL path] lastPathComponent] stringByDeletingPathExtension];
-            textField.text = safeName;
         }
         
+        textField.text = [[[[_document url] path] lastPathComponent] stringByDeletingPathExtension];
     }
     
     // UITextField adjusts its recognizers when it starts editing. Put ours back.
@@ -254,6 +267,13 @@ static NSString * const SelectAction = @"select";
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string;
 {
     OBPRECONDITION(textField == _documentTitleTextField);
+    
+    // <bug://bugs/61021>
+    NSRange r = [string rangeOfString:@"/"];
+    if (r.location != NSNotFound) {
+        return NO;
+    }
+    
     return YES;
 }
 
@@ -447,6 +467,29 @@ static NSString * const SelectAction = @"select";
 }
 
 #pragma mark -
+#pragma mark OUIUndoBarButtonItemTarget
+
+- (void)undo:(id)sender;
+{
+    [_document undo:sender];
+}
+
+- (void)redo:(id)sender;
+{
+    [_document redo:sender];
+}
+
+- (BOOL)canPerformAction:(SEL)action withSender:(id)sender;
+{
+    if (action == @selector(undo:))
+        return [_document.undoManager canUndo];
+    else if (action == @selector(redo:))
+        return [_document.undoManager canRedo];
+        
+    return YES;
+}
+
+#pragma mark -
 #pragma mark Private
 
 - (void)_openDocument:(OUIDocumentProxy *)proxy;
@@ -513,6 +556,13 @@ static NSString * const SelectAction = @"select";
         _toolbarViewController.innerViewController = _document.viewController;
         [self hideActivityIndicator]; // will be up for the initial app load
     }
+
+    // Start automatically tracking undo state from this document's undo manager
+    _undoBarButtonItem.undoManager = _document.undoManager;
+
+    // UIWindow will automatically create an undo manager if one isn't found along the responder chain. We want to be darn sure that don't end up getting two undo managers and accidentally splitting our registrations between them.
+    OBASSERT([_document undoManager] == [_document.viewController undoManager]);
+    OBASSERT([_document undoManager] == [_document.viewController.view undoManager]); // Does your view controller implement -undoManager? We don't do this for you right now.
 }
 
 - (void)_openDocument:(OUIDocumentProxy *)proxy animated:(BOOL)animated;
@@ -540,6 +590,9 @@ static NSString * const SelectAction = @"select";
         _toolbarViewController.innerViewController = self.documentPicker;
         return;
     }
+    
+    // Stop tracking the state from this document's undo manager
+    _undoBarButtonItem.undoManager = nil;
     
     [_window endEditing:YES];
     
@@ -588,11 +641,6 @@ static NSString * const SelectAction = @"select";
     [_window endEditing:YES/*force*/];
     
     [self showInspectorFromBarButtonItem:_infoBarButtonItem];
-}
-
-- (void)_undo:(id)sender;
-{
-    [_document undo:sender];
 }
 
 - (void)_handleTitleTapGesture:(UIGestureRecognizer*)gestureRecognizer;
