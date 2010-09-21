@@ -6,6 +6,7 @@
 // <http://www.omnigroup.com/developer/sourcecode/sourcelicense/>.
 
 #import "OUIOverlayView.h"
+#import <QuartzCore/QuartzCore.h>
 #import <UIKit/UIKit.h>
 #import <OmniBase/OmniBase.h>
 
@@ -116,40 +117,6 @@ RCS_ID("$Id$");
     }
     
     [overlayView displayTemporarilyInView:view];
-}
-
-+ (void)displayTemporaryOverlayInView:(UIView *)view withString:(NSString *)string positionedForGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer displayInterval:(NSTimeInterval)displayInterval;
-{
-    if (!_overlayView) {
-        _overlayView = [[OUIOverlayView alloc] initWithFrame:CGRectMake(300, 100, 200, 26)];
-    }
-    
-    _overlayView.text = string;
-    
-    [_overlayView centerAtPositionForGestureRecognizer:gestureRecognizer inView:view];
-    
-    if (displayInterval) {
-        _overlayView.messageDisplayInterval = displayInterval;
-    }
-    
-    [_overlayView displayTemporarilyInView:view];
-}
-
-+ (void)displayTemporaryOverlayInView:(UIView *)view withString:(NSString *)string alignment:(OUIOverlayViewAlignment)alignment displayInterval:(NSTimeInterval)displayInterval;
-{
-    if (!_overlayView) {
-        _overlayView = [[OUIOverlayView alloc] initWithFrame:CGRectMake(300, 100, 200, 26)];
-    }
-    
-    _overlayView.text = string;
-    
-    [_overlayView useAlignment:alignment withinBounds:view.bounds];
-    
-    if (displayInterval) {
-        _overlayView.messageDisplayInterval = displayInterval;
-    }
-    
-    [_overlayView displayTemporarilyInView:view];
 }
 
 - (void)displayTemporarilyInView:(UIView *)view;
@@ -476,11 +443,6 @@ RCS_ID("$Id$");
     CGRect bounds = self.bounds;
         
     [[isa backgroundImage] drawInRect:bounds blendMode:kCGBlendModeNormal alpha:0.8];
-    
-    // Draw border
-    [[UIColor colorWithWhite:0.8 alpha:0.8] set];
-    path.lineWidth = 1.5;
-    [path stroke];
     
     // Draw text
     if (self.text.length) {

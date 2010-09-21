@@ -15,6 +15,23 @@
 		2899E5220DE3E06400AC0155 /* SimpleTextEditorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2899E5210DE3E06400AC0155 /* SimpleTextEditorViewController.xib */; };
 		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
 		28D7ACF80DDB3853001CB0EB /* SimpleTextEditorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* SimpleTextEditorViewController.m */; };
+		F19946761248600D00146E12 /* OUILoupeOverlaySubject.h in Copy OmniUI Headers */ = {isa = PBXBuildFile; fileRef = F199467312485FCB00146E12 /* OUILoupeOverlaySubject.h */; };
+		F199467D1248605400146E12 /* NSAttributedString-OFExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = F199467A1248605400146E12 /* NSAttributedString-OFExtensions.m */; };
+		F199467E1248605400146E12 /* NSMutableString-OFExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = F199467C1248605400146E12 /* NSMutableString-OFExtensions.m */; };
+		F199467F1248605D00146E12 /* NSAttributedString-OFExtensions.h in Copy OmniFoundation Headers */ = {isa = PBXBuildFile; fileRef = F19946791248605400146E12 /* NSAttributedString-OFExtensions.h */; };
+		F19946801248605D00146E12 /* NSMutableString-OFExtensions.h in Copy OmniFoundation Headers */ = {isa = PBXBuildFile; fileRef = F199467B1248605400146E12 /* NSMutableString-OFExtensions.h */; };
+		F19946961248606D00146E12 /* NSString-OFReplacement.m in Sources */ = {isa = PBXBuildFile; fileRef = F19946951248606D00146E12 /* NSString-OFReplacement.m */; };
+		F19946971248607000146E12 /* NSString-OFReplacement.h in Copy OmniFoundation Headers */ = {isa = PBXBuildFile; fileRef = F19946941248606D00146E12 /* NSString-OFReplacement.h */; };
+		F19946A01248607A00146E12 /* OFStringDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = F199469F1248607A00146E12 /* OFStringDecoder.m */; };
+		F19946A11248608300146E12 /* OFStringDecoder.h in Copy OmniFoundation Headers */ = {isa = PBXBuildFile; fileRef = F199469E1248607A00146E12 /* OFStringDecoder.h */; };
+		F19946AA1248608C00146E12 /* OFStringScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = F19946A91248608C00146E12 /* OFStringScanner.m */; };
+		F19946AB1248608F00146E12 /* OFStringScanner.h in Copy OmniFoundation Headers */ = {isa = PBXBuildFile; fileRef = F19946A81248608C00146E12 /* OFStringScanner.h */; };
+		F19946B31248609A00146E12 /* OFCharacterScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = F19946B21248609A00146E12 /* OFCharacterScanner.m */; };
+		F19946B41248609C00146E12 /* OFCharacterScanner.h in Copy OmniFoundation Headers */ = {isa = PBXBuildFile; fileRef = F19946B11248609A00146E12 /* OFCharacterScanner.h */; };
+		F19946BE124860C000146E12 /* NSMutableAttributedString-OFExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = F19946BD124860C000146E12 /* NSMutableAttributedString-OFExtensions.m */; };
+		F19946BF124860C400146E12 /* NSMutableAttributedString-OFExtensions.h in Copy OmniFoundation Headers */ = {isa = PBXBuildFile; fileRef = F19946BC124860C000146E12 /* NSMutableAttributedString-OFExtensions.h */; };
+		F19946C8124860EE00146E12 /* OATextAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = F19946C7124860EE00146E12 /* OATextAttributes.m */; };
+		F19946C9124860F600146E12 /* OATextAttributes.h in Copy OmniAppKit Headers */ = {isa = PBXBuildFile; fileRef = F19946C6124860EE00146E12 /* OATextAttributes.h */; };
 		F1A81C1D119C816800C027C0 /* OUIScalingScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = F1A81C13119C816800C027C0 /* OUIScalingScrollView.m */; };
 		F1A81C1E119C816800C027C0 /* OUIScalingView.m in Sources */ = {isa = PBXBuildFile; fileRef = F1A81C15119C816800C027C0 /* OUIScalingView.m */; };
 		F1A81C1F119C816800C027C0 /* OUIScalingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F1A81C17119C816800C027C0 /* OUIScalingViewController.m */; };
@@ -256,6 +273,13 @@
 			dstPath = $DERIVED_SOURCES_DIR/FrameworkHeaders/OmniFoundation;
 			dstSubfolderSpec = 0;
 			files = (
+				F19946B41248609C00146E12 /* OFCharacterScanner.h in Copy OmniFoundation Headers */,
+				F19946AB1248608F00146E12 /* OFStringScanner.h in Copy OmniFoundation Headers */,
+				F19946BF124860C400146E12 /* NSMutableAttributedString-OFExtensions.h in Copy OmniFoundation Headers */,
+				F19946A11248608300146E12 /* OFStringDecoder.h in Copy OmniFoundation Headers */,
+				F19946971248607000146E12 /* NSString-OFReplacement.h in Copy OmniFoundation Headers */,
+				F199467F1248605D00146E12 /* NSAttributedString-OFExtensions.h in Copy OmniFoundation Headers */,
+				F19946801248605D00146E12 /* NSMutableString-OFExtensions.h in Copy OmniFoundation Headers */,
 				F1A81C9E119C824800C027C0 /* OFUtilities.h in Copy OmniFoundation Headers */,
 				F1A81C9F119C824800C027C0 /* CFDictionary-OFExtensions.h in Copy OmniFoundation Headers */,
 				F1A81CA0119C824800C027C0 /* NSString-OFUnicodeCharacters.h in Copy OmniFoundation Headers */,
@@ -301,6 +325,7 @@
 			dstPath = $DERIVED_SOURCES_DIR/FrameworkHeaders/OmniAppKit;
 			dstSubfolderSpec = 0;
 			files = (
+				F19946C9124860F600146E12 /* OATextAttributes.h in Copy OmniAppKit Headers */,
 				F1C9EEF011988C6A00228B3B /* OAParagraphStyle.h in Copy OmniAppKit Headers */,
 				F1C9EEF111988C6A00228B3B /* OAFontDescriptor.h in Copy OmniAppKit Headers */,
 			);
@@ -313,6 +338,7 @@
 			dstPath = $DERIVED_SOURCES_DIR/FrameworkHeaders/OmniUI;
 			dstSubfolderSpec = 0;
 			files = (
+				F19946761248600D00146E12 /* OUILoupeOverlaySubject.h in Copy OmniUI Headers */,
 				F1A81C67119C821D00C027C0 /* UIView-OUIExtensions.h in Copy OmniUI Headers */,
 				F1A81C68119C821D00C027C0 /* OUIInspectorDividerLine.h in Copy OmniUI Headers */,
 				F1A81C69119C821D00C027C0 /* OUIInspectorSlice.h in Copy OmniUI Headers */,
@@ -388,6 +414,23 @@
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* OmniTextEditor_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OmniTextEditor_Prefix.pch; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* SimpleTextEditor-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SimpleTextEditor-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		F199467312485FCB00146E12 /* OUILoupeOverlaySubject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OUILoupeOverlaySubject.h; path = iPad/OUILoupeOverlaySubject.h; sourceTree = "<group>"; };
+		F19946791248605400146E12 /* NSAttributedString-OFExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSAttributedString-OFExtensions.h"; path = "OpenStepExtensions.subproj/NSAttributedString-OFExtensions.h"; sourceTree = "<group>"; };
+		F199467A1248605400146E12 /* NSAttributedString-OFExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSAttributedString-OFExtensions.m"; path = "OpenStepExtensions.subproj/NSAttributedString-OFExtensions.m"; sourceTree = "<group>"; };
+		F199467B1248605400146E12 /* NSMutableString-OFExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSMutableString-OFExtensions.h"; path = "OpenStepExtensions.subproj/NSMutableString-OFExtensions.h"; sourceTree = "<group>"; };
+		F199467C1248605400146E12 /* NSMutableString-OFExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSMutableString-OFExtensions.m"; path = "OpenStepExtensions.subproj/NSMutableString-OFExtensions.m"; sourceTree = "<group>"; };
+		F19946941248606D00146E12 /* NSString-OFReplacement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString-OFReplacement.h"; path = "OpenStepExtensions.subproj/NSString-OFReplacement.h"; sourceTree = "<group>"; };
+		F19946951248606D00146E12 /* NSString-OFReplacement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString-OFReplacement.m"; path = "OpenStepExtensions.subproj/NSString-OFReplacement.m"; sourceTree = "<group>"; };
+		F199469E1248607A00146E12 /* OFStringDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OFStringDecoder.h; sourceTree = "<group>"; };
+		F199469F1248607A00146E12 /* OFStringDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OFStringDecoder.m; sourceTree = "<group>"; };
+		F19946A81248608C00146E12 /* OFStringScanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OFStringScanner.h; sourceTree = "<group>"; };
+		F19946A91248608C00146E12 /* OFStringScanner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OFStringScanner.m; sourceTree = "<group>"; };
+		F19946B11248609A00146E12 /* OFCharacterScanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OFCharacterScanner.h; sourceTree = "<group>"; };
+		F19946B21248609A00146E12 /* OFCharacterScanner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OFCharacterScanner.m; sourceTree = "<group>"; };
+		F19946BC124860C000146E12 /* NSMutableAttributedString-OFExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSMutableAttributedString-OFExtensions.h"; path = "OpenStepExtensions.subproj/NSMutableAttributedString-OFExtensions.h"; sourceTree = "<group>"; };
+		F19946BD124860C000146E12 /* NSMutableAttributedString-OFExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSMutableAttributedString-OFExtensions.m"; path = "OpenStepExtensions.subproj/NSMutableAttributedString-OFExtensions.m"; sourceTree = "<group>"; };
+		F19946C6124860EE00146E12 /* OATextAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OATextAttributes.h; path = OpenStepExtensions.subproj/OATextAttributes.h; sourceTree = "<group>"; };
+		F19946C7124860EE00146E12 /* OATextAttributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OATextAttributes.m; path = OpenStepExtensions.subproj/OATextAttributes.m; sourceTree = "<group>"; };
 		F1A81C12119C816800C027C0 /* OUIScalingScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OUIScalingScrollView.h; path = iPad/OUIScalingScrollView.h; sourceTree = "<group>"; };
 		F1A81C13119C816800C027C0 /* OUIScalingScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OUIScalingScrollView.m; path = iPad/OUIScalingScrollView.m; sourceTree = "<group>"; };
 		F1A81C14119C816800C027C0 /* OUIScalingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OUIScalingView.h; path = iPad/OUIScalingView.h; sourceTree = "<group>"; };
@@ -782,8 +825,22 @@
 				F1AD02E21198A9B300D331CA /* NSDictionary-OFExtensions.m */,
 				F1AD03121198AA6800D331CA /* NSString-OFUnicodeCharacters.h */,
 				F1AD03131198AA6800D331CA /* NSString-OFUnicodeCharacters.m */,
+				F19946791248605400146E12 /* NSAttributedString-OFExtensions.h */,
+				F199467A1248605400146E12 /* NSAttributedString-OFExtensions.m */,
+				F199467B1248605400146E12 /* NSMutableString-OFExtensions.h */,
+				F199467C1248605400146E12 /* NSMutableString-OFExtensions.m */,
+				F19946BC124860C000146E12 /* NSMutableAttributedString-OFExtensions.h */,
+				F19946BD124860C000146E12 /* NSMutableAttributedString-OFExtensions.m */,
+				F19946941248606D00146E12 /* NSString-OFReplacement.h */,
+				F19946951248606D00146E12 /* NSString-OFReplacement.m */,
 				F1AD03091198AA3D00D331CA /* NSObject-OFExtensions.h */,
 				F1AD030A1198AA3D00D331CA /* NSObject-OFExtensions.m */,
+				F199469E1248607A00146E12 /* OFStringDecoder.h */,
+				F199469F1248607A00146E12 /* OFStringDecoder.m */,
+				F19946A81248608C00146E12 /* OFStringScanner.h */,
+				F19946A91248608C00146E12 /* OFStringScanner.m */,
+				F19946B11248609A00146E12 /* OFCharacterScanner.h */,
+				F19946B21248609A00146E12 /* OFCharacterScanner.m */,
 				F1AD03181198AA7800D331CA /* OFUnicodeUtilities.h */,
 				F1AD03051198AA2F00D331CA /* OFByte.h */,
 			);
@@ -794,6 +851,8 @@
 		F1C9ECB91198857200228B3B /* OmniAppKit */ = {
 			isa = PBXGroup;
 			children = (
+				F19946C6124860EE00146E12 /* OATextAttributes.h */,
+				F19946C7124860EE00146E12 /* OATextAttributes.m */,
 				F1C9EEED11988C6000228B3B /* OAParagraphStyle.h */,
 				F1C9EEEE11988C6000228B3B /* OAParagraphStyle.m */,
 				F1C9EEEA11988C5500228B3B /* OAFontDescriptor.h */,
@@ -935,6 +994,7 @@
 				F1A81C45119C81C900C027C0 /* OUIEditableFrameDelegate.h */,
 				F1A81C46119C81C900C027C0 /* OUILoupeOverlay.h */,
 				F1A81C47119C81C900C027C0 /* OUILoupeOverlay.m */,
+				F199467312485FCB00146E12 /* OUILoupeOverlaySubject.h */,
 				F1A81C48119C81C900C027C0 /* OUITextCursorOverlay.h */,
 				F1A81C49119C81C900C027C0 /* OUITextCursorOverlay.m */,
 				F1A81C4A119C81C900C027C0 /* OUITextInputStringTokenizer.h */,
@@ -1023,7 +1083,14 @@
 			isa = PBXProject;
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "SimpleTextEditor" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1183,6 +1250,14 @@
 				F1A81C56119C81C900C027C0 /* OUITextInputStringTokenizer.m in Sources */,
 				F1A81C57119C81C900C027C0 /* OUITextLayout.m in Sources */,
 				F1A81C58119C81C900C027C0 /* OUITextThumb.m in Sources */,
+				F199467D1248605400146E12 /* NSAttributedString-OFExtensions.m in Sources */,
+				F199467E1248605400146E12 /* NSMutableString-OFExtensions.m in Sources */,
+				F19946961248606D00146E12 /* NSString-OFReplacement.m in Sources */,
+				F19946A01248607A00146E12 /* OFStringDecoder.m in Sources */,
+				F19946AA1248608C00146E12 /* OFStringScanner.m in Sources */,
+				F19946B31248609A00146E12 /* OFCharacterScanner.m in Sources */,
+				F19946BE124860C000146E12 /* NSMutableAttributedString-OFExtensions.m in Sources */,
+				F19946C8124860EE00146E12 /* OATextAttributes.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

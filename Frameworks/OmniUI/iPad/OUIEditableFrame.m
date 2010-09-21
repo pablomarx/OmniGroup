@@ -114,8 +114,6 @@ static void btrace(void)
 
 @implementation OUIEditableFrame
 
-@synthesize content = _content;
-
 static id do_init(OUIEditableFrame *self)
 {
     self.contentMode = UIViewContentModeRedraw;
@@ -470,9 +468,6 @@ static void rectanglesInRange(CTFrameRef frame, NSRange r, BOOL sloppy, rectangl
     if (firstLine < 0 || firstLine >= lineCount)
         return;
     
-	CGFloat yPreceedingLine = -1.0f;
-	CGFloat descentPreceedingLine = -1.0f;
-	
     for (CFIndex lineIndex = firstLine; lineIndex < lineCount; lineIndex ++) {
         CTLineRef line = CFArrayGetValueAtIndex(lines, lineIndex);
         CFRange lineRange = CTLineGetStringRange(line);
@@ -534,9 +529,6 @@ static void rectanglesInRange(CTFrameRef frame, NSRange r, BOOL sloppy, rectangl
             }
         }
         
-		yPreceedingLine = lineOrigin[0].y;
-		descentPreceedingLine = descent;
-				
         if (!keepGoing || lastLine)
             break;
     }
@@ -671,7 +663,6 @@ static void getTypographicPosition(CFArrayRef lines, NSUInteger posIndex, int af
  The "text" or "rendering" coordinate system is the interior scaled, (de-)flipped, and possibly translated system for CoreGraphics calls to draw stuff.
  
  The "layout" coordinate system is translated from the rendering coordinate system because CTFramesetter is particular about where it puts its text.
- The layoutOrigin ivar holds the coordinates, in the rendering coordinate system, of the layout coordinate system's origin.
  
  Some locations are in a line-based coordinate system, which is the text layout coordinate system translated so that a given line's origin is at (0,0).
 
@@ -760,7 +751,6 @@ static void getTypographicPosition(CFArrayRef lines, NSUInteger posIndex, int af
     
     flags.delegateRespondsToLayoutChanged = ( newDelegate && [newDelegate respondsToSelector:@selector(textViewLayoutChanged:)] )? 1 : 0;
     flags.delegateRespondsToContentsChanged = ( newDelegate && [newDelegate respondsToSelector:@selector(textViewContentsChanged:)] )? 1 : 0;
-	flags.delegateRespondsToContentsChangedInRange = ( newDelegate && [newDelegate respondsToSelector:@selector(textView:didChangeTextInRange:replacementText:)] )? 1 : 0;
 }
 
 @synthesize delegate;
@@ -813,7 +803,7 @@ static void getTypographicPosition(CFArrayRef lines, NSUInteger posIndex, int af
     [items[0] release];
 }
 
-- (void)thumbBegan:(OUITextThumb *)thumb caretRect:(CGRect)caretRect;
+- (void)thumbBegan:(OUITextThumb *)thumb;
 {
     if (!_loupe) {
         _loupe = [[OUILoupeOverlay alloc] initWithFrame:[self frame]];
@@ -824,9 +814,9 @@ static void getTypographicPosition(CFArrayRef lines, NSUInteger posIndex, int af
     [self _setSolidCaret:1];
 }
 
-- (void)thumbMoved:(OUITextThumb *)thumb targetPosition:(CGPoint)pt caretRect:(CGRect)caretRect;
+- (void)thumbMoved:(OUITextThumb *)thumb targetPosition:(CGPoint)pt;
 {
-    _loupe.touchPoint = caretRect.origin;
+    _loupe.touchPoint = pt;
     _loupe.mode = OUILoupeOverlayRectangle;
     
     OUEFTextPosition *pp;
@@ -868,7 +858,7 @@ static void getTypographicPosition(CFArrayRef lines, NSUInteger posIndex, int af
     }
 }
 
-- (void)thumbEnded:(OUITextThumb *)thumb normally:(BOOL)normalEnd caretRect:(CGRect)caretRect;
+- (void)thumbEnded:(OUITextThumb *)thumb normally:(BOOL)normalEnd;
 {
     _loupe.mode = OUILoupeOverlayNone;
     [self _setSolidCaret:-1];
@@ -1564,7 +1554,7 @@ static BOOL _recognizerTouchedView(UIGestureRecognizer *recognizer, UIView *view
         [delegate textViewContentsChanged:self];
      */
     
-    //[self setNeedsDisplay];
+    [self setNeedsDisplay];
 }
 
 #pragma mark -
@@ -1694,10 +1684,7 @@ enum {
     [self _setSelectionToIndex: ( replaceRange.location + [text length] )];
     notifyAfterMutate(self, _cmd);
     
-	if (flags.delegateRespondsToContentsChangedInRange) {
-		[delegate textView: self didChangeTextInRange: replaceRange replacementText: text];
-	}
-    //[self setNeedsDisplay];
+    [self setNeedsDisplay];
 }
 
 - (void)deleteBackward;
@@ -1730,7 +1717,7 @@ enum {
         afterMutate(self, _cmd);
         [self _setSelectionToIndex:cr.location];
         notifyAfterMutate(self, _cmd);
-        //[self setNeedsDisplay];
+        [self setNeedsDisplay];
     }
 }
 
@@ -1847,8 +1834,8 @@ enum {
     afterMutate(self, _cmd);
     [self _setSelectionToIndex:endex];
     notifyAfterMutate(self, _cmd);
-	
-    //[self setNeedsDisplay];
+    
+    [self setNeedsDisplay];
 }
 
 - (UITextRange *)selectedTextRange

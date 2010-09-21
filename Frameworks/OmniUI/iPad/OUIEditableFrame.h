@@ -124,9 +124,9 @@
 - (UITextRange *)selectionRangeForPoint:(CGPoint)p wordSelection:(BOOL)selectWords;
 
 /* These are the interface from the thumbs to our selection machinery */
-- (void)thumbBegan:(OUITextThumb *)thumb caretRect:(CGRect)caretRect;
-- (void)thumbMoved:(OUITextThumb *)thumb targetPosition:(CGPoint)pt caretRect:(CGRect)caretRect;
-- (void)thumbEnded:(OUITextThumb *)thumb normally:(BOOL)normalEnd caretRect:(CGRect)caretRect;
+- (void)thumbBegan:(OUITextThumb *)thumb;
+- (void)thumbMoved:(OUITextThumb *)thumb targetPosition:(CGPoint)pt;
+- (void)thumbEnded:(OUITextThumb *)thumb normally:(BOOL)normalEnd;
 
 /* These are the interface from the inspectable spans */
 - (id <NSObject>)attribute:(NSString *)attr inRange:(UITextRange *)r;
